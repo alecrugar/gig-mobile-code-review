@@ -38,10 +38,10 @@ const GameScreen = () => {
         setFilteredGames(formattedGames);
         setLoading(false);
       });
-  }, [dispatch]);
+  }, [dispatch, games]);
 
   useEffect(() => {
-    const filtered = games.filter((game:any) =>
+    const filtered = games.filter((game: any) =>
       game.name.toLowerCase().includes(search.toLowerCase())
     );
     setFilteredGames(filtered);
