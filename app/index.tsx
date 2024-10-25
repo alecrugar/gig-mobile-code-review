@@ -1,3 +1,5 @@
+import { AppDispatch, RootState } from '@/store';
+import { setGames, toggleFavorite } from '@/store/gameSlice';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -6,10 +8,16 @@ import {
   FlatList,
   ActivityIndicator,
   StyleSheet,
+  TouchableOpacity,
 } from 'react-native';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 const GameScreen = () => {
-  const [games, setGames] = useState<any>([]);
+  const dispatch = useDispatch<AppDispatch>();
+  const games = useSelector((state: any) => state.game.games);
+  const favorites = useSelector((state: RootState) => state.game.favorites);
+
   const [filteredGames, setFilteredGames] = useState<any>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<any>(null);
@@ -26,18 +34,22 @@ const GameScreen = () => {
             displayName: `${data[i].name} - Category: ${data[i].category}`,
           });
         }
-        setGames(formattedGames);
+        dispatch(setGames(formattedGames));
         setFilteredGames(formattedGames);
         setLoading(false);
       });
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
-    const filtered = games.filter((game: any) =>
+    const filtered = games.filter((game:any) =>
       game.name.toLowerCase().includes(search.toLowerCase())
     );
     setFilteredGames(filtered);
   }, [search]);
+
+  const handleToggleFavorite = (gameId: number) => {
+    dispatch(toggleFavorite(gameId));
+  };
 
   if (loading) {
     return <ActivityIndicator size="large" />;
@@ -62,11 +74,43 @@ const GameScreen = () => {
       />
       <FlatList
         data={filteredGames}
-        renderItem={({ item }) => <Text>{item.displayName}</Text>}
         keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.gameContainer}>
+            <Text>{item.displayName}</Text>
+            <TouchableOpacity
+              onPress={() => handleToggleFavorite(item.id)}
+              style={{
+                padding: 5,
+                backgroundColor: favorites.includes(item.id)
+                  ? 'gold'
+                  : 'lightgray',
+                borderRadius: 5,
+              }}
+            >
+              <Text>
+                {favorites.includes(item.id) ? 'Unfavorite' : 'Favorite'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
       />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  gameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+});
 
 export default GameScreen;
