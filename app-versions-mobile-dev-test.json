@@ -1,0 +1,10 @@
+{
+  "ios": {
+    "minimum": "1.0.0",
+    "storeUrl": "https://www.apple.com/store"
+  },
+  "android": {
+    "minimum": "1.0.0",
+    "storeUrl": "https://play.google.com/store/games?hl=en"
+  }
+}
